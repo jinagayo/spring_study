@@ -39,13 +39,16 @@ src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </style>
 </head>
 <body>
+
 <table>
 	<tr><td id="tab1" class="tab">
 	<a href="javascript:disp_div('minfo', 'tab1')" class="title">회원정보</a></td>
 		<c:if test="${param.userid != 'admin'}">
 			<td id="tab2" class="tab">
-	<a href="javascript:disp_div('oinfo','tab2')" class="title">주문정보</a></td>
-		</c:if></tr></table>
+			<a href="javascript:disp_div('oinfo','tab2')" class="title">주문정보</a></td>
+		</c:if></tr>
+</table>
+
 	<div id="oinfo" class="info" style="display:none; width:100%;">
 	<table><tr><th>주문번호</th><th>주문일자</th><th>주문금액</th></tr>
 	<c:forEach items="${salelist}" var="sale" varStatus="stat">
@@ -69,7 +72,9 @@ src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 					</td></tr></c:forEach></table>
 					</td></tr>
 			</c:forEach>
-			</table></div>
+			</table>
+	</div>
+	
 	<div id="minfo" class="info">
 	<table>
 		<tr><td>아이디</td><td>${user.userid}</td></tr>

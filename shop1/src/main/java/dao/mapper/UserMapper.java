@@ -5,8 +5,11 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import logic.User;
 
@@ -23,5 +26,23 @@ public interface UserMapper {
 		"<if test='userid != null'> where userid=#{userid}</if>",
 		"</script>"	})
 	List<User> select(Map<String,Object> param);
+
+	@Update("update useraccount set username=#{username},"
+			+ "birthday=#{birthday}, phoneno=#{phoneno}, postcode=#{postcode},"
+			+ "address=#{address}, email=#{email} where userid=#{userid}")
+	void update(User user);
+
+	@Delete("delete from useraccount where userid=#{userid}")
+	void delete(String userid);
+
+	@Update("update useraccount set password=#{password} WHERE userid=#{userid}")
+	void updatePass(@Param("userid") String userid, @Param("password") String password);
+
+	@Select({"<script>",
+		"select ${col} from useraccount "
+		+ "where email=#{email} and phoneno=#{phoneno} "
+		+ "<if test='userid != null '> and userid=#{userid}</if>",
+		"</script>" })
+	String search(Map<String, Object> param);
 
 }
