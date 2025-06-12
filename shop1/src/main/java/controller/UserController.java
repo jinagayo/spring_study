@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import exception.ShopException;
+import logic.Sale;
 import logic.User;
+import service.ShopService;
 import service.UserService;
 
 @Controller
@@ -23,8 +27,10 @@ import service.UserService;
 public class UserController {
 	@Autowired
 	private UserService service;
+	@Autowired
+	private ShopService shopService;
 	
-	@GetMapping("*")   //Get 방식 모든 요청시 호출
+	@GetMapping("*")   // Get 방식 모든 요청시 호출
 	public ModelAndView form() {
 		ModelAndView mav = new ModelAndView();
 		mav.addObject(new User());
@@ -105,7 +111,10 @@ public class UserController {
 	public ModelAndView idCheckMypage(String userid, HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		User user = service.selectUser(userid);
+		//Sale : db정보, 고객정보, 주문상품정보
+		List<Sale> salelist = shopService.saleList(userid);
 		mav.addObject("user",user);
+		mav.addObject("salelist",salelist);
 		return mav;
 	}
 	@RequestMapping("logout")
@@ -233,6 +242,14 @@ public class UserController {
 				return "redirect:mypage?userid="+loginUser.getUserid();
 	}
 	
+/*
+ * 2. 문제
+	 * 비밀번호 찾기를 비밀번호 초기화로 수정하기
+	 * 기존 비밀번호 : 1234
+	 * 비밀번호 초기화 : 전체 6자리의 대문자/소문자/숫자 임의의 조합으로 변경하기
+	 * 				 사용자에게 출력하기
+ */
+	
 	@PostMapping("{url}search")  //idsearch 요청.  url=id
 	public ModelAndView search(User user, BindingResult bresult,
 			 @PathVariable String url) {
@@ -243,7 +260,7 @@ public class UserController {
 		String code = "error.userid.search";
 		String title = "아이디";
 		if(url.equals("pw")) {
-			title = "비밀번호";
+			title = "비밀번호 초기화";
 			code = "error.password.search";
 			if(user.getUserid() == null ||
 					user.getUserid().trim().equals("")) {
@@ -265,10 +282,17 @@ public class UserController {
 	if(user.getUserid() != null && user.getUserid().trim().equals(""))
 		user.setUserid(null);  //빈 문자열("") 인 경우 null 변경
 	String result = service.getSearch(user);
+
 	if(result == null) {  //검색된 아이디나 비밀번호가 없는 경우
 		bresult.reject(code);
 		return mav;
 	}
+	//아이디 또는 비밀번호를 검색한 경우
+	if(url.equals("pw")) {
+		 service.initPW(user.getUserid());
+		 result = service.getSearch(user);
+	}
+	
 	//검색 완료인 경우
 	mav.addObject("result", result);
 	mav.addObject("title",title);

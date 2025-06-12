@@ -35,5 +35,8 @@ public class UserService {
 	public String getSearch(User user) {
 		return userdao.search(user);
 	}
+	public void initPW(String userid) {
+		userdao.initPw(userid);
+	}
 
 }

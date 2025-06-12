@@ -59,4 +59,9 @@ public class UserDao {
 		param.put("phoneno", user.getPhoneno());
 		return template.getMapper(cls).search(param);
 	}
+
+
+	public void initPw(String userid) {
+		template.getMapper(cls).initPW(userid);
+	}
 }

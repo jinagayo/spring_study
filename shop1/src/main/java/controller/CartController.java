@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 import logic.Cart;
 import logic.Item;
 import logic.ItemSet;
+import logic.Sale;
+import logic.User;
 import service.ShopService;
 
 @Controller
@@ -39,10 +43,63 @@ public class CartController {
 			cart = new Cart();
 			session.setAttribute("CART", cart);
 		}
+	
+		for (ItemSet i : cart.getItemSetList()) {
+		    if(id == i.getItem().getId()) {
+		    	i.setQuantity(i.getQuantity() + quantity);
+		    	mav.addObject("message", item.getName() + ":" + quantity + "개 장바구니 추가");
+				mav.addObject("cart",cart);
+				return mav;
+		    }
+		}
 		cart.push(new ItemSet(item, quantity));
 		mav.addObject("message", item.getName() + ":" + quantity + "개 장바구니 추가");
 		mav.addObject("cart",cart);
-		return mav;
-		
+		return mav;	
 	}
+	
+	@RequestMapping("cartDelete")
+	public ModelAndView delete(int index, HttpSession session) {
+		ModelAndView mav = new ModelAndView("cart/cart");  //cart.jsp로 포워드
+		Cart cart = (Cart)session.getAttribute("CART");
+		ItemSet removeObj = cart.getItemSetList().remove(index);  //삭제하는 객체 저장
+		/*
+		 * E remove(int) : 인덱스에 해당하는 객체를 제거. 제거된 객체를 리턴
+		 * boolean remove(Object) : 객체를 입력받아서 객체를 제거. 제거여부를 리턴 
+		 */
+		mav.addObject("message",removeObj.getItem().getName()
+				+ "가(이) 삭제되었습니다.");
+		mav.addObject("cart", cart);
+		return mav;
+	}
+	
+	@RequestMapping("cartView")
+	public ModelAndView view(HttpSession session) {
+		ModelAndView mav = new ModelAndView("cart/cart");
+		mav.addObject("message","장바구니 상품 조회");
+		mav.addObject("cart", session.getAttribute("CART")); 
+		return mav;
+	}
+	/*
+	 * 주문 전 확인 페이지
+	 * 1. 장바구니에 상품 존재해야함
+	 * 	  상품이 없는 경우 예외 발생.
+	 * 2. 로그인된 상태여야 함.
+	 * 	  로그아웃상태 : 예외 발생
+	 */
+	@RequestMapping("checkout")
+	public String checkout(HttpSession session) {
+		return null;
+	}
+	@RequestMapping("end")
+	public ModelAndView checkend(HttpSession session) {
+		ModelAndView mav = new ModelAndView();
+		Cart cart = (Cart)session.getAttribute("CART");  //장바구니 상품
+		User loginUser = (User)session.getAttribute("loginUser");  //로그인 정보
+		Sale sale = service.checkend(loginUser, cart);
+		session.removeAttribute("CART");  //장바구니 제거
+		mav.addObject("sale",sale); 
+		return mav;
+	}
+	
 }

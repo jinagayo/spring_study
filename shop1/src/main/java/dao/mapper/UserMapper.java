@@ -45,4 +45,14 @@ public interface UserMapper {
 		"</script>" })
 	String search(Map<String, Object> param);
 
+	@Update("update useraccount set password = CONCAT("
+			+ " SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', FLOOR(RAND() * 62) + 1, 1),"
+			+ " SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', FLOOR(RAND() * 62) + 1, 1),"
+			+ " SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', FLOOR(RAND() * 62) + 1, 1),"
+			+ " SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', FLOOR(RAND() * 62) + 1, 1),"
+			+ " SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', FLOOR(RAND() * 62) + 1, 1),"
+			+ " SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', FLOOR(RAND() * 62) + 1, 1))"
+			+ " where userid=#{userid}")
+	void initPW(String userid);
+
 }
